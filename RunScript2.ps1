@@ -1,4 +1,4 @@
 ﻿#powershell.exe
 conda activate opencv_py37
-python .\kasagoAutoTrigger4.py
+python .\MainProgram.py
 conda deactivate

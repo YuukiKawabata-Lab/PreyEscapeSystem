@@ -25,11 +25,11 @@ void loop() {
     
 
 // ////////////////////////////////    
-    //モーターの設定
-    analogWrite(9,13);//回転速度:1~255
-    delay(50);//回転時間:ミリ秒
-    analogWrite(9,13);//回転速度:1~255
-    delay(800);//回転時間:ミリ秒
+    //Motor settings
+    analogWrite(9,13);//Change second parameter to change motor speed between 1 to 255
+    delay(50);//Duration of motor running (ms) 
+    analogWrite(9,13);
+    delay(800);
 // ////////////////////////////////    
   
     analogWrite(9,0);

@@ -4,38 +4,56 @@ import time
 import serial
 import tisgrabber as IC
 
-#変数の指定
+#=== Program settings ===
+
+# True: Using a high speed camera, False: Using a normal USB camera
 HighSpeedCam:bool=True
-#UVC:str="DMK 33UX287 25020344"
-UVC:str="DMK 33UX287 32020061"
+
+# *** Settings of DMK33UX287 high speed camera (The Imaging Source Co., Ltd.) ***
+# Provide a serial number of high speed camera
+# UVC:str="Serial number"
+# UVC:str="DMK 33UX287 25020344" # 公開前に消す
+UVC:str="DMK 33UX287 32020061" # 公開前に消す
+# Set a video format of high speed camera
 videoFormat:str="Y800 (640x480)"
-camNum:int = 0  #カメラ
-camFPS:int = 500 #フレームレート
-#roiX:int = 1030
-#roiY:int = 550
+# *** End of high speed camera settings ***
+
+# *** Normal USB camera settings ***
+# Set a camera number
+camNum:int = 0
+# *** End of Normal USB camera settings *** 
+
+# *** Image processing settings ***
+# Set a maximum target frame rate 
+camFPS:int = 500 
+# True: Show a real time frame rate 
 printDetail:bool = False
+# Center points of the search circle and reaction circle 
 roiX:int = 285
 roiY:int = 250
-
-
-
-
-
-
-
-disThresh:int = 43
+# Diameter of the search circle
 roiRad:int = 165
+# Diameter of the initial pray position
 roiRadInner:int=7
+# Diameter of the reaction circle (reaction distance)
+disThresh:int = 43
+# Binary thresholding parameter 
 binalyThresh:int = 65
+# *** End of image processing settings ***
 
+# *** Arduino settings ***
+# Select a COM board connecting Arduino
 board:str = 'COM5'
+# Serial communication speed
 serialSpeed:int = 115200
 
+#=== End of program settings ===
 
 
 def main():
-    #カメラの読み込み
+    # Capture camera frame
     if(HighSpeedCam):
+        # High speed camera
         Camera = IC.TIS_CAM()
 
         Camera.open(UVC)
@@ -43,40 +61,34 @@ def main():
         Camera.SetVideoFormat(videoFormat)
         # Set a frame rate of 500 frames per second
         Camera.SetFrameRate(camFPS)
-        # ダイアログから設定
-        #Camera.ShowDeviceSelectionDialog()
         Camera.StartLive(0)
     else:
         video1 = cv2.VideoCapture(camNum)
         
-        #カメラの設定
+        # Normal USB camera
         video1.set(cv2.CAP_PROP_FPS, camFPS)
-        video1.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('H', '2', '6', '4')) #フォーマットhttps://qiita.com/iwatake2222/items/b8c442a9ec0406883950
-        video1.set(cv2.CAP_PROP_BUFFERSIZE, 1) #http://project12513.blog-fps.com/raspberrypi%E9%96%8B%E7%99%BA/%E3%83%A9%E3%82%BA%E3%83%91%E3%82%A4%E3%81%A7opencv%E3%81%AE%E5%87%A6%E7%90%86%E3%82%92%E9%80%9F%E3%81%8F%E3%81%99%E3%82%8B
+        video1.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('H', '2', '6', '4'))
+        video1.set(cv2.CAP_PROP_BUFFERSIZE, 1)
         
-    #クラスの読み込み
+    # import class
     Processing = autoTrigger(Camera,5)
     SerialCom = serialtrigger(board, serialSpeed)
-    #映像の投影
+    # Capture camera frame
     if(HighSpeedCam):
         frame = uvcRead(Camera)
     else:
         retval, frame = video1.read()
     
     if(True):
-        #無限ループ
         loop=[0]
         append=loop.append
         waitKey=cv2.waitKey
         for i in loop:
             append(i+1)
         # while(True):
-    #画像の更新
-            timeStart:float = time.time() #読み込み時の時間
+            timeStart:float = time.time() 
             
-            
-    #処理
-
+            # Process image
             ProcessedFrame=Processing.multiChannel2binary(frame, binalyThresh)
             ProcessedFrame=Processing.openingOrClosing(ProcessedFrame,False)
             ProcessedFrame=cv2.bitwise_not(ProcessedFrame)
@@ -88,7 +100,7 @@ def main():
             #ProcessedFrame=SerialCom.distanceTrigger(roiX, roiY, disThresh, posxy, frame)
             SerialCom.distanceTrigger(roiX, roiY, disThresh, posxy, frame)
             
-            #ROIの描写
+            # Draw ROI
             frame = cv2.circle(frame, (roiX,roiY), roiRad, (0,255,255),3)
             frame = cv2.circle(frame, (roiX,roiY), roiRadInner, (0,255,255),-1)
             
@@ -97,24 +109,22 @@ def main():
             #cv2.resizeWindow("Processed",960,540)
             cv2.imshow("Processed",ProcessedFrame)
             
-            
             cv2.namedWindow("Native",cv2.WINDOW_NORMAL)
             cv2.resizeWindow("Native",640,480)
             #cv2.resizeWindow("Native",960,540)
             cv2.imshow("Native",frame)
-                    
-            
-    #トリガー・ウィンドウの表示・キーボード入力待ち        
+
+            # key input
             key = waitKey(1)
             
             SerialCom.switchTrigger(key)
     
-    #投影終了処理
+            # Stop update frame
             if(key==ord('q')):
                 break
             #Processing.printData(timeStart,False)
     
-    #画像の更新
+            # Update frame
             if(HighSpeedCam):
                 frame=uvcRead(Camera)
             else:
@@ -122,10 +132,9 @@ def main():
                 if(retval==False):
                     break
 
-    #データの表示
+            # Display frame rate info
             Processing.printData(timeStart, printDetail)
-    
-    #ウィンドウの破壊・終了
+
     cv2.destroyAllWindows()
     if(HighSpeedCam):
         Camera.StopLive()
@@ -163,7 +172,7 @@ class autoTrigger:
     def __init__(self, camera, kernelSize :int):
         self.camera=camera
         self.uvcInfo:tuple=tuple(camera.GetImageDescription())
-        # 平均画像フレーム
+        # Average Image
         self.accum_frame :list = np.zeros((self.uvcInfo[1],self.uvcInfo[0]),np.float32)
         self.maskInitial = self.accum_frame.copy()
         self.maskInitial2 = self.accum_frame.copy()
@@ -174,17 +183,14 @@ class autoTrigger:
     def accum(self, frame :list, wight :float = 0.2, colorScale :bool = False):
         if(len(frame[1,1,:])==3):
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        # 入力画像を浮動小数点型に変換
         f_frame :list= frame.astype(self.float32)
-        # 画像蓄積
         self.accumulateWeighted(f_frame, self.accum_frame, wight)
-        # 差分計算
         diff_frame :list= cv2.absdiff(f_frame, self.accum_frame)
         diff_frame:list = diff_frame.astype(np.uint8)
         return diff_frame
 
     def printData(self,time_now :float,movieVal:bool=True):
-        timeProcess :float = time.time() - time_now  #一連の処理時間
+        timeProcess :float = time.time() - time_now
         if(movieVal):
             if(timeProcess==0):
                 print("Est: NA fps, Processing: {:.3f} s, {}×{}".format(timeProcess,self.uvcInfo[0],self.uvcInfo[1]))
@@ -197,31 +203,25 @@ class autoTrigger:
                 print("Est: {:.1f} fps".format(1/timeProcess))
             
     def multiChannel2binary(self,frame :list,val :int):
-        #グレースケールに変換
         if(len(frame[1,1,:])==3):
             imageGray:list = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        #valの値で2値化
         ret,binalyImage = cv2.threshold(imageGray,val,255,cv2.THRESH_BINARY)
         return binalyImage
 
     def openingOrClosing(self,binalyImage :list,opening :bool = True, rep :int = 1):
         if(opening):
-            #白ノイズ除去
             for i in range(rep):
                 binalyImage:list = cv2.morphologyEx(binalyImage, cv2.MORPH_OPEN, self.kernel)
         else:
-            #黒ノイズ除去
             for i in range(rep):
                 binalyImage:list = cv2.morphologyEx(binalyImage, cv2.MORPH_CLOSE, self.kernel)
         return binalyImage
     
     def roiMask(self,Processedframe:list,x:int,y:int,radius:int,radius2:int):
-        #GrayScale
         mask:list = self.maskInitial
         mask2:list = self.maskInitial2
         cv2.circle(mask, center=(x,y), radius=radius, color=255, thickness=-1)
         cv2.circle(mask2, center=(x,y), radius=radius2, color=255, thickness=-1)
-        # 入力画像を浮動小数点型に変換
         #maskedFrame = Processedframe.astype(np.float32)
         maskedFrame = Processedframe.astype(np.uint8)
         maskedFrame[mask==0]=[0]
@@ -258,7 +258,7 @@ class serialtrigger:
         self.com = serial.Serial(board,speed)
         #self.com.rts = False
         self.trigger_flag = False
-        self.ex_flag = False #実験開始
+        self.ex_flag = False
         #self.serbo_flag = False
         
     def distanceTrigger(self,targetX:int,targetY:int,distanceThresh:int,trakingPoint:tuple,frame:list):
@@ -273,32 +273,28 @@ class serialtrigger:
         if self.ex_flag and self.trigger_flag:
             self.com.write(str.encode('a'))                
             #print("Triggered")
-            #Threshの描写
             frame = cv2.circle(frame, (targetX,targetY), distanceThresh, (0,0,255),3)
                 
         return frame
 
-        
     def switchTrigger(self,key:int):
-        if(key==ord('e')): #実験開始
+        if(key==ord('e')): # Start Experiment
             self.ex_flag = True
             self.trigger_flag = False
             
-        if(key==ord('n')): #トリガーオフ
+        if(key==ord('n')): # Trigger off
             self.ex_flag = False
             self.trigger_flag = False
             self.com.write(str.encode('b'))
-        if(key==ord('q')):
+        if(key==ord('q')): # Stop Program
              self.com.write(str.encode('b')) 
              self.com.close()
-             
-             
+
 def uvcRead(Camera):
     Camera.SnapImage()
     image:list = Camera.GetImage()
     image:list = cv2.flip(image,0)
     return image
-
 
 if __name__ == '__main__':
     main()
