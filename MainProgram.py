@@ -229,7 +229,7 @@ class autoTrigger:
         
         return maskedFrame    
     def contoursFromBinaly(self,frameBinaly:list,frameNative:list,drawContour:bool=False):
-        contours, hierarchy = cv2.findContours(frameBinaly,cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        _, contours, hierarchy = cv2.findContours(frameBinaly,cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
             
         maxArea:int = 0
         cntMaxarea:int = 0
