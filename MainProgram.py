@@ -12,8 +12,6 @@ HighSpeedCam:bool=True
 # *** Settings of DMK33UX287 high speed camera (The Imaging Source Co., Ltd.) ***
 # Provide a serial number of high speed camera
 # UVC:str="Serial number"
-# UVC:str="DMK 33UX287 25020344" # 公開前に消す
-UVC:str="DMK 33UX287 32020061" # 公開前に消す
 # Set a video format of high speed camera
 videoFormat:str="Y800 (640x480)"
 # *** End of high speed camera settings ***
