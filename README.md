@@ -8,6 +8,8 @@ This repository is source code of the automated prey escape system.
 
 Please refer to our preprint about this system.
 
+Preprint: https://www.biorxiv.org/content/10.1101/2023.07.02.547369v1
+
 ## System Details
 
 This system was developed using a UVC (DMK33UX287, The Imaging Source Co., Ltd., Bremen, Germany) and Arduino UNO R3. 
