@@ -6,9 +6,11 @@ This repository is source code of the automated prey escape system.
 
 `MotorControl.ino` is the program controls a motor on Arduino
 
-Please refer to our preprint about this system.
+Please refer to our articel and preprint about this system.
 
-Preprint: https://www.biorxiv.org/content/10.1101/2023.07.02.547369v1
+- Articel: Nozomi Sunami, Hibiki Kimura, Hidechika Ito, Koichi Hashimoto, Yuta Sato, Soki Tachibana, Mikiya Hidaka, Kouki Miyama, Hirofumi Watanabe, Yuuki Kawabata; Automated escape system: identifying prey's kinematic and behavioral features critical for predator evasion. J Exp Biol 15 May 2024; 227 (10): jeb246772. doi: https://doi.org/10.1242/jeb.246772
+
+- Preprint: https://www.biorxiv.org/content/10.1101/2023.07.02.547369v1
 
 ## System Details
 
@@ -33,3 +35,7 @@ For more details about IC Imaging Control SDK, please refer to [IC_IMAGEING_READ
 5. Run `MainProgram.py`. If you want to change program settings, please modify lines 7-50.
 
 6. Press the "E" key to activate the program and trigger the motor. Press the "N" key to continue processing camera frames without triggering the motor. Press the "Q" key to stop the program and exit.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
