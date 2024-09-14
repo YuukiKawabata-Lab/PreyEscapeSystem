@@ -6,9 +6,9 @@ This repository is source code of the automated prey escape system.
 
 `MotorControl.ino` is the program controls a motor on Arduino
 
-Please refer to our articel and preprint about this system.
+Please refer to our article and preprint about this system.
 
-- Articel: Nozomi Sunami, Hibiki Kimura, Hidechika Ito, Koichi Hashimoto, Yuta Sato, Soki Tachibana, Mikiya Hidaka, Kouki Miyama, Hirofumi Watanabe, Yuuki Kawabata; Automated escape system: identifying prey's kinematic and behavioral features critical for predator evasion. J Exp Biol 15 May 2024; 227 (10): jeb246772. doi: https://doi.org/10.1242/jeb.246772
+- article: Nozomi Sunami, Hibiki Kimura, Hidechika Ito, Koichi Hashimoto, Yuta Sato, Soki Tachibana, Mikiya Hidaka, Kouki Miyama, Hirofumi Watanabe, Yuuki Kawabata; Automated escape system: identifying prey's kinematic and behavioral features critical for predator evasion. Journal of Experimental Biology 15 May 2024; 227 (10): jeb246772. doi: https://doi.org/10.1242/jeb.246772
 
 - Preprint: https://www.biorxiv.org/content/10.1101/2023.07.02.547369v1
 
